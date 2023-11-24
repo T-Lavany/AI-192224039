@@ -1,24 +1,23 @@
-at(door, monkey).
-at(window, box).
+on(floor, monkey).
+on(floor, chair).
+in(room, monkey).
+in(room, chair).
+in(room, banana).
 at(ceiling, banana).
 
-% Move actions
-move(state(P, P, B), grasp, state(P, P, B)). % grab banana
-move(state(P, M, B), climb, state(P, M, B)). % climb box
-move(state(P1, M, B), push(P1, P2), state(P2, M, B)) :- opposite(P1, P2), at(P1, box). % push box
+strong(monkey).
+grasp(monkey).
+climb(monkey, chair) :- strong(monkey).
 
-% Opposite sides of the room
-opposite(door, window).
-opposite(window, door).
+push(monkey, chair) :- strong(monkey).
 
-% Goal state: monkey has banana
-goal_state(state(ceiling, _, banana)).
+under(banana, chair) :- push(monkey, chair).
 
-% Solve the problem
-solve(State, Actions) :-
-    goal_state(State), % If already in goal state, no actions needed
-    Actions = [].
+canreach(banana, monkey) :-
+    (at(floor, banana); at(ceiling, banana)),
+    under(banana, chair),
+    climb(monkey, chair).
 
-solve(State, [Action | Rest]) :-
-    move(State, Action, NextState),
-    solve(NextState, Rest).
+canget(banana, monkey) :-
+    canreach(banana, monkey),
+    grasp(monkey).
